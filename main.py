@@ -1,24 +1,29 @@
 import asyncio
 import logging
-from aiogram import Bot, Dispatcher, types
-from aiogram.contrib.fsm_storage.memory import MemoryStorage
-import config
+from bot import create_bot
 import handlers
 
-logging.basicConfig(level=logging.INFO)
-
 async def main():
-    bot = Bot(token=config.TOKEN, parse_mode=types.ParseMode.HTML)
-    dp = Dispatcher(bot, storage=MemoryStorage())
-
-    # Регистрация команд
+    # Встроенная настройка логов вместо внешнего файла
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(levelname)s - %(message)s"
+    )
+    
+    bot, dp = create_bot()
+    
+    # Регистрация всех функций из файла handlers
     handlers.register_handlers(dp)
-
-    print("Бот запущен и готов к работе!")
+    
+    print("AI 🧠 IMAGE HD запущен и готов к работе!")
+    
     try:
         await dp.start_polling()
     finally:
         await bot.session.close()
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except (KeyboardInterrupt, SystemExit):
+        logging.info("Бот остановлен")
